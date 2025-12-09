@@ -1,0 +1,38 @@
+name: Commit Message Validation
+
+# This workflow runs when a Pull Request is opened, synchronized (new push to the PR branch),
+# or when the PR target branch changes.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches:
+      - main
+
+jobs:
+  commitlint:
+    name: Validate PR Commit Messages
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the repository code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          # Fetch the full history to check all commits in the PR
+          fetch-depth: 0
+
+      # 2. Setup Node.js (required for running commitlint)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # 3. Install commitlint and config
+      - name: Install Dependencies
+        run: |
+          npm install --global @commitlint/cli @commitlint/config-conventional
+
+      # 4. Run the validation Action
+      - name: Run Commit Message Validation
+        # This action uses commitlint to check all commits associated with the PR
+        uses: wagoid/commitlint-github-action@v6
